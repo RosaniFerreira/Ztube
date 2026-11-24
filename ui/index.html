@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZTube</title>
+<style>
+:root{--bk:#bcc6d3;--pg:#d0d8e3;--sb:#c6cfdb;--cd:#e5ebf2;--fd:#edf1f6;--bd:#c3cddb;--tx:#28313d;--mu:#5d6876;--ac:#7346ce;--ach:#6236ba;--acs:#d6ccea;--act:#4d2e8a;--on:#fff;--ok:#1d8a4a;--wa:#a8650a;--ov:rgba(28,37,51,.35);--er:#c0392b;--sh:0 1px 2px rgba(35,48,70,.08),0 6px 18px -4px rgba(35,48,70,.14);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){
+:root:not([data-theme="light"]){--er:#ff8a80;--sh:0 1px 2px rgba(0,0,0,.28),0 8px 20px -6px rgba(0,0,0,.35);--bk:#1c1d21;--pg:#27292e;--sb:#202226;--cd:#35383f;--fd:#3d4048;--bd:#4a4e57;--tx:#eceef2;--mu:#a7adb8;--ac:#8b5cf0;--ach:#9b72f3;--acs:#4e4267;--act:#d1bbfb;--on:#fff;--ok:#5fd18b;--wa:#f2c14e;--ov:rgba(20,21,24,.55);color-scheme:dark}}
+:root[data-theme="dark"]{--er:#ff8a80;--sh:0 1px 2px rgba(0,0,0,.28),0 8px 20px -6px rgba(0,0,0,.35);--bk:#1c1d21;--pg:#27292e;--sb:#202226;--cd:#35383f;--fd:#3d4048;--bd:#4a4e57;--tx:#eceef2;--mu:#a7adb8;--ac:#8b5cf0;--ach:#9b72f3;--acs:#4e4267;--act:#d1bbfb;--on:#fff;--ok:#5fd18b;--wa:#f2c14e;--ov:rgba(20,21,24,.55);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bk);color:var(--tx);font-family:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;transition:background .2s}
+.i{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:middle}
+.dev{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;padding:14px 16px 4px;font-size:12px;color:var(--mu)}
+.dev button{height:30px;padding:0 12px;border:1px solid var(--bd);border-radius:8px;background:var(--cd);color:var(--tx);font:inherit;font-size:12px;cursor:pointer}
+.dev button.on{border-color:var(--ac);color:var(--act);background:var(--acs)}
+#stage{padding:14px 16px 24px;overflow-x:hidden}
+#hold{margin:0 auto}
+.app{width:1200px;height:700px;display:flex;flex-direction:column;background:var(--pg);border:1px solid var(--bd);border-radius:12px;overflow:hidden;position:relative;font-size:14px;transform-origin:0 0;box-shadow:0 18px 50px rgba(20,30,50,.18)}
+.tbar{height:34px;flex:none;display:flex;align-items:center;gap:8px;padding-left:14px;font-size:12px;background:var(--sb);border-bottom:1px solid var(--bd)}
+.tbar .c{width:46px;display:flex;justify-content:center;color:var(--mu);font-size:14px}
+.side{width:72px;flex:none;background:var(--sb);display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:8px;border-right:1px solid var(--bd)}
+.nav{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:var(--mu);cursor:pointer;font-size:22px}
+.nav:hover{background:var(--cd)}.nav.on{background:var(--acs);color:var(--act)}
+.card{background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;box-shadow:var(--sh)}
+.h{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;margin-bottom:12px}
+.h .i{font-size:18px;color:var(--ac)}
+.r{display:flex;align-items:center;gap:10px}
+.fld{display:flex;align-items:center;gap:8px;height:40px;border:1px solid var(--bd);border-radius:9px;background:var(--fd);padding:0 12px;flex:1;min-width:0}
+.fld:focus-within{border-color:var(--ac)}
+.fld input{border:0;outline:0;background:transparent;color:var(--tx);font:inherit;font-size:13.5px;line-height:20px;padding:0;flex:1;min-width:0}
+input::placeholder{color:var(--mu)}
+.selw{position:relative}
+.selw::after{content:"";position:absolute;right:15px;top:50%;width:7px;height:7px;border-right:2px solid var(--mu);border-bottom:2px solid var(--mu);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+select{appearance:none;-webkit-appearance:none;display:block;width:100%;height:40px;padding:0 38px 0 12px;font:inherit;font-size:13.5px;color:var(--tx);background:var(--fd);border:1px solid var(--bd);border-radius:9px;cursor:pointer;outline:0}
+select:focus{border-color:var(--ac)}
+select option{background:var(--fd);color:var(--tx)}
+button{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:40px;padding:0 16px;border:1px solid var(--bd);border-radius:9px;background:var(--fd);color:var(--act);font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+button:hover{border-color:var(--ac)}
+button:focus-visible,.fc:focus-visible,.nav:focus-visible,.sw:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+button .i{font-size:17px}
+.pri{background:var(--ac);border-color:var(--ac);color:var(--on)}
+.pri:hover{background:var(--ach)}
+.chip{display:flex;align-items:center;gap:8px;background:var(--acs);color:var(--act);border-radius:8px;padding:9px 12px;font-size:13px;margin-top:12px}
+.fmt{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.fc{display:flex;align-items:center;gap:10px;height:52px;border:1px solid var(--bd);border-radius:10px;background:var(--fd);padding:0 14px;cursor:pointer;font-size:14px;font-weight:600}
+.fc .i{font-size:20px;color:var(--mu)}
+.fc.on{border:2px solid var(--ac);background:var(--acs);color:var(--act)}.fc.on .i{color:var(--ac)}
+.dot{width:17px;height:17px;border-radius:50%;border:2px solid var(--bd);flex:none}.fc.on .dot{border:5px solid var(--ac);background:var(--fd)}
+.sw{width:40px;height:22px;border-radius:11px;background:var(--bd);position:relative;cursor:pointer;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
+.sw.on{background:var(--ac)}.sw.on::after{left:21px}
+.o{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;cursor:pointer}
+input[type=radio],input[type=checkbox],input[type=range]{accent-color:var(--ac);margin:0}
+.mu{color:var(--mu);font-size:13px}
+.pgb{height:10px;background:var(--fd);border:1px solid var(--bd);border-radius:6px;overflow:hidden;flex:1}
+.pgb div{height:100%;width:0;background:var(--ac);transition:width .2s}
+.pill{background:var(--acs);color:var(--act);font-size:13px;font-weight:700;border-radius:6px;padding:4px 10px;min-width:52px;text-align:center}
+.ovl{position:absolute;inset:34px 0 0 0;background:var(--ov);display:flex;align-items:center;justify-content:center}
+.dlg{background:var(--pg);border:1px solid var(--bd);border-radius:14px;width:680px;max-height:600px;display:flex;flex-direction:column}
+.li{display:grid;grid-template-columns:20px 110px minmax(0,1fr) 50px;gap:10px;align-items:center;padding:6px 0;border-top:1px solid var(--bd)}
+.li .fld{height:32px}
+.tm{font-family:Consolas,"Cascadia Mono",monospace;font-size:12.5px;color:var(--mu)}
+.du{font-size:12.5px;color:var(--mu);text-align:right}
+.ctx{display:none}
+.dotw{position:absolute;top:7px;right:7px;width:9px;height:9px;border-radius:50%;background:#e0a325;box-shadow:0 0 0 2px var(--sb)}
+.stp{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.stp .i{font-size:13px}
+.stp.ok{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.stp.old{background:color-mix(in srgb,var(--wa) 20%,transparent);color:var(--wa)}
+.stp.miss{background:color-mix(in srgb,#d9534f 18%,transparent);color:#d9534f}
+.req .ric{width:44px;height:44px;border-radius:10px;font-size:22px}
+.req .pgb{height:6px;margin-top:8px}
+.sum{display:flex;align-items:center;gap:14px}
+.sumi{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;flex:none}
+.pthumb{width:176px;height:99px;border-radius:10px;background:var(--acs);color:var(--act);display:flex;align-items:center;justify-content:center;font-size:36px;position:relative;flex:none;overflow:hidden}
+.pthumb.round{width:99px;border-radius:50%}
+.bd2{font-size:12px;font-weight:600;color:var(--act);background:var(--acs);border-radius:6px;padding:3px 8px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.bd2 .i{font-size:14px}
+.bd2.red{background:#d93b30;color:#fff}
+.tl{position:relative;height:32px;border-radius:8px;background:var(--fd);border:1px solid var(--bd);overflow:hidden;user-select:none;touch-action:none}
+.segs{position:absolute;inset:0;display:flex;transition:opacity .15s}
+.segs div{height:100%;border-right:2px solid var(--fd);background:color-mix(in srgb,var(--ac) 55%,transparent)}
+.segs div:nth-child(even){background:color-mix(in srgb,var(--ac) 38%,transparent)}
+.segs div.off{background:transparent!important}
+.segs div:hover{background:var(--ac)!important}
+.tl.trim .segs{opacity:.3}
+.selR{position:absolute;top:0;bottom:0;background:color-mix(in srgb,var(--ac) 30%,transparent);box-shadow:inset 0 0 0 2px var(--ac);display:none;pointer-events:none}
+.hd{position:absolute;top:0;bottom:0;width:12px;margin-left:-6px;background:var(--ac);border-radius:4px;cursor:ew-resize;display:none}
+.hd::after{content:"";position:absolute;left:5px;top:9px;bottom:9px;width:2px;background:#fff;border-radius:1px;opacity:.8}
+.tl.trim .selR,.tl.trim .hd{display:block}
+.gth{aspect-ratio:16/9;border-radius:7px;background:var(--acs);color:var(--act);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative}
+*{scrollbar-width:thin;scrollbar-color:var(--bd) transparent}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:var(--mu)}
+::-webkit-scrollbar-button{display:none}
+#recList{padding-right:4px}
+.rec{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--bd)}
+.rec:first-child{border-top:0}
+.ric{width:34px;height:34px;border-radius:8px;background:var(--acs);color:var(--act);display:flex;align-items:center;justify-content:center;flex:none;font-size:17px}
+.rec .ib{width:30px;height:30px}
+.sec{font-size:16px;font-weight:700;margin-top:6px;display:flex;align-items:center;gap:8px}
+.sec .i{font-size:19px;color:var(--ac)}
+.tip .lic{margin-left:auto;font-size:11.5px;font-weight:600;color:var(--mu);background:var(--fd);border:1px solid var(--bd);border-radius:6px;padding:2px 8px;white-space:nowrap}
+.tip ul{margin:0;padding-left:18px}
+.page{display:none;flex:1;min-height:0;padding:18px 26px;flex-direction:column;gap:14px}.page.on{display:flex}
+.badge{position:absolute;top:4px;right:3px;min-width:17px;height:17px;border-radius:9px;background:var(--ac);color:var(--on);font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.foot{height:34px;flex:none;display:flex;align-items:center;gap:6px;padding:0 26px;border-top:1px solid var(--bd);background:var(--sb);font-size:12.5px;color:var(--mu)}
+.foot a.lk{font-size:12.5px}
+.tabs{display:inline-flex;background:var(--cd);border:1px solid var(--bd);border-radius:10px;padding:3px;gap:3px}
+.tabs div{height:32px;padding:0 16px;border-radius:7px;display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--mu);cursor:pointer}
+.tabs div.on{background:var(--fd);color:var(--act);box-shadow:0 0 0 1px var(--bd)}
+.cnt{font-size:11.5px;background:var(--acs);color:var(--act);border-radius:8px;padding:0 6px;line-height:17px}
+.item{display:flex;align-items:center;gap:14px;padding:12px 14px;background:var(--cd);border:1px solid var(--bd);border-radius:12px;box-shadow:var(--sh)}
+.item .thumb{width:88px;height:50px;font-size:20px}
+.ib{width:34px;height:34px;padding:0;border-radius:8px}
+.ib .i{font-size:16px}
+.tip h3{margin:0 0 6px;font-size:14px;display:flex;align-items:center;gap:8px}
+.tip h3 .i{font-size:18px;color:var(--ac)}
+.tip p,.tip li{margin:0;font-size:13px;line-height:1.55;color:var(--mu)}
+.tip ol{margin:0;padding-left:18px}
+.lk{display:inline-flex;align-items:center;gap:5px;color:var(--act);font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap}
+.lk:hover{text-decoration:underline}.lk .i{font-size:15px}
+.media{display:flex;gap:12px;align-items:flex-start;margin-top:12px;padding:8px;border-radius:10px;background:var(--fd);border:1px solid var(--bd)}
+.thumb{width:100px;height:56px;border-radius:8px;background:var(--acs);color:var(--act);display:flex;align-items:center;justify-content:center;flex:none;position:relative;font-size:26px}
+.thumb.round{width:56px;border-radius:50%}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--act)}
+.tag .i{font-size:14px}
+.live{position:absolute;left:6px;bottom:6px;background:#d93b30;color:#fff;font-size:10.5px;font-weight:700;border-radius:4px;padding:1px 6px}
+.dur{position:absolute;right:6px;bottom:6px;background:rgba(0,0,0,.65);color:#fff;font-size:10.5px;border-radius:4px;padding:1px 5px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+body{overflow:hidden;background:var(--pg)}
+.app{width:100vw!important;height:100vh!important;border:0!important;border-radius:0!important;box-shadow:none!important;transform:none!important}
+.ovl{inset:0!important}
+.thumb{overflow:hidden}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.thumb .live,.thumb .dur{z-index:2}
+.pgb.ind div{width:30%!important;animation:ind 1.2s ease-in-out infinite}
+@keyframes ind{0%{transform:translateX(-110%)}100%{transform:translateX(340%)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+svg:has(use[href="#i-loader-2"]){animation:spin 1s linear infinite}
+.ta{display:block;width:100%;resize:none;border:1px solid var(--bd);border-radius:9px;background:var(--fd);color:var(--tx);font:inherit;font-size:13px;padding:8px 10px;outline:0;line-height:1.5}
+.ta:focus{border-color:var(--ac)}
+.logbox{margin-top:8px;padding:8px 10px;background:var(--fd);border:1px solid var(--bd);border-radius:8px;font-family:Consolas,"Cascadia Mono",monospace;font-size:11.5px;line-height:1.5;color:var(--mu);max-height:110px;overflow:auto;white-space:pre-wrap;word-break:break-all;user-select:text}
+.toast{position:fixed;left:50%;bottom:52px;transform:translate(-50%,16px);background:var(--tx);color:var(--pg);padding:10px 16px;border-radius:10px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:70%;text-align:center;z-index:50;box-shadow:var(--sh)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--mu);padding:70px 0;font-size:14px}
+.empty .i{color:var(--ac)}
+button:disabled{opacity:.55;cursor:default}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="zlogo" viewBox="0 0 1000 860"><path fill="currentColor" fill-rule="evenodd" d="M122.6 858.8C123.1 858.1 164.7 805.0 215.2 740.8C265.7 676.5 307.0 623.8 307.0 623.5C307.0 623.2 247.7 623.0 175.2 623.0C60.1 623.0 42.7 622.8 37.5 621.5C19.9 616.9 6.1 603.1 1.5 585.5C-0.0 579.5 -0.5 569.4 0.6 565.2L1.2 563.0L77.1 563.0L153.0 563.0L153.0 427.0L153.0 291.0L100.8 290.9C72.0 290.9 46.5 290.7 44.0 290.4C23.6 287.9 6.0 272.3 1.6 253.0C-0.0 245.9 -0.4 237.3 0.6 233.3L1.2 231.0L308.8 230.8L616.4 230.5L683.2 145.5L750.1 60.5L614.5 60.2C540.0 60.1 418.0 60.1 343.5 60.2L208.0 60.5L207.7 96.5L207.5 132.5L202.7 132.8C183.5 134.0 163.4 119.7 155.8 99.4C153.6 93.7 153.6 92.2 153.2 46.8L152.9 0.0L513.5 0.0L874.1 0.0L868.7 6.8C865.8 10.5 826.8 60.1 782.0 117.0C737.3 173.9 699.0 222.6 696.8 225.1C694.7 227.7 693.0 230.0 693.0 230.3C693.0 230.7 722.1 231.1 757.8 231.3C814.2 231.6 823.4 231.8 829.5 233.3C855.0 239.4 877.9 251.0 902.2 270.0C912.3 278.0 932.2 297.6 941.7 309.0C974.8 348.8 1000.0 400.0 1000.0 427.3C1000.0 453.8 974.2 505.7 941.7 544.6C906.4 587.0 864.8 614.2 824.5 621.4C817.8 622.6 786.5 622.8 630.2 622.9C527.7 623.0 444.0 622.6 444.2 622.2C444.3 621.7 454.8 608.2 467.4 592.2L490.3 563.0L654.9 562.8L819.5 562.5L828.4 559.7C840.4 556.0 853.4 549.3 865.0 541.2C876.7 532.9 896.1 513.7 905.7 500.9C925.2 474.8 938.6 446.6 939.7 429.0C941.4 401.7 908.4 347.4 872.7 318.7C857.0 306.1 845.0 299.5 828.0 294.2L819.5 291.5L513.5 291.2L207.5 291.0L207.5 427.0L207.5 563.0L281.4 562.8L355.4 562.5L443.0 451.0L530.7 339.5L569.0 339.2L607.3 339.0L604.4 342.7C599.6 349.1 247.9 796.4 246.2 798.3C244.8 799.9 257.7 800.0 518.4 799.8L792.0 799.5L792.3 763.5L792.5 727.5L800.0 727.5C821.4 727.5 840.9 743.9 845.5 765.7C846.7 771.0 847.0 782.1 847.0 816.2L847.0 860.0L484.4 860.0C194.7 860.0 122.0 859.7 122.6 858.8Z"/></symbol></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="i-shield-check" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M11.46 20.846a12 12 0 0 1 -7.96 -14.846a12 12 0 0 0 8.5 -3a12 12 0 0 0 8.5 3a12 12 0 0 1 -.09 7.06" /> <path d="M15 19l2 2l4 -4" /></symbol><symbol id="i-history" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M12 8l0 4l2 2" /> <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5" /></symbol><symbol id="i-code" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M7 8l-4 4l4 4" /> <path d="M17 8l4 4l-4 4" /> <path d="M14 4l-4 16" /></symbol><symbol id="i-brand-windows" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M17.8 20l-12 -1.5c-1 -.1 -1.8 -.9 -1.8 -1.9v-9.2c0 -1 .8 -1.8 1.8 -1.9l12 -1.5c1.2 -.1 2.2 .8 2.2 1.9v12.1c0 1.2 -1.1 2.1 -2.2 1.9z" /> <path d="M12 5l0 14" /> <path d="M4 12l16 0" /></symbol><symbol id="i-world" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /> <path d="M3.6 9h16.8" /> <path d="M3.6 15h16.8" /> <path d="M11.5 3a17 17 0 0 0 0 18" /> <path d="M12.5 3a17 17 0 0 1 0 18" /></symbol><symbol id="i-lock" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z" /> <path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /> <path d="M8 11v-4a4 4 0 1 1 8 0v4" /></symbol><symbol id="i-clock" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /> <path d="M12 12l3 2" /> <path d="M12 7v5" /></symbol><symbol id="i-package" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" /> <path d="M12 12l8 -4.5" /> <path d="M12 12l0 9" /> <path d="M12 12l-8 -4.5" /> <path d="M16 5.25l-8 4.5" /></symbol><symbol id="i-alert-circle" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /> <path d="M12 8v4" /> <path d="M12 16h.01" /></symbol><symbol id="i-check" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M5 12l5 5l10 -10" /></symbol><symbol id="i-home" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M5 12l-2 0l9 -9l9 9l-2 0" /> <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" /> <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" /></symbol><symbol id="i-download" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /> <path d="M7 11l5 5l5 -5" /> <path d="M12 4l0 12" /></symbol><symbol id="i-cloud-download" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M19 18a3.5 3.5 0 0 0 0 -7h-1a5 4.5 0 0 0 -11 -2a4.6 4.4 0 0 0 -2.1 8.4" /> <path d="M12 13l0 9" /> <path d="M9 19l3 3l3 -3" /></symbol><symbol id="i-circle-check" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /> <path d="M9 12l2 2l4 -4" /></symbol><symbol id="i-help-circle" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /> <path d="M12 16v.01" /> <path d="M12 13a2 2 0 0 0 .914 -3.782a1.98 1.98 0 0 0 -2.414 .483" /></symbol><symbol id="i-moon" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" /></symbol><symbol id="i-sun" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /> <path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" /></symbol><symbol id="i-link" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M9 15l6 -6" /> <path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464" /> <path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463" /></symbol><symbol id="i-brand-youtube" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M2 8a4 4 0 0 1 4 -4h12a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-12a4 4 0 0 1 -4 -4v-8z" /> <path d="M10 9l5 3l-5 3z" /></symbol><symbol id="i-x" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M18 6l-12 12" /> <path d="M6 6l12 12" /></symbol><symbol id="i-clipboard" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /> <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /></symbol><symbol id="i-movie" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" /> <path d="M8 4l0 16" /> <path d="M16 4l0 16" /> <path d="M4 8l4 0" /> <path d="M4 16l4 0" /> <path d="M4 12l16 0" /> <path d="M16 8l4 0" /> <path d="M16 16l4 0" /></symbol><symbol id="i-broadcast" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M18.364 19.364a9 9 0 1 0 -12.728 0" /> <path d="M15.536 16.536a5 5 0 1 0 -7.072 0" /> <path d="M12 13m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /></symbol><symbol id="i-user-circle" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /> <path d="M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /> <path d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855" /></symbol><symbol id="i-playlist" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M14 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /> <path d="M17 17v-13h4" /> <path d="M13 5h-10" /> <path d="M3 9l10 0" /> <path d="M9 13h-6" /></symbol><symbol id="i-list-details" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M13 5h8" /> <path d="M13 9h5" /> <path d="M13 15h8" /> <path d="M13 19h5" /> <path d="M3 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /> <path d="M3 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /></symbol><symbol id="i-adjustments-horizontal" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M14 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M4 6l8 0" /> <path d="M16 6l4 0" /> <path d="M8 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M4 12l2 0" /> <path d="M10 12l10 0" /> <path d="M17 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M4 18l11 0" /> <path d="M19 18l1 0" /></symbol><symbol id="i-video" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M15 10l4.553 -2.276a1 1 0 0 1 1.447 .894v6.764a1 1 0 0 1 -1.447 .894l-4.553 -2.276v-4z" /> <path d="M3 6m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" /></symbol><symbol id="i-music" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /> <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /> <path d="M9 17v-13h10v13" /> <path d="M9 8h10" /></symbol><symbol id="i-folder" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M5 4h4l3 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-11a2 2 0 0 1 2 -2" /></symbol><symbol id="i-folder-open" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M5 19l2.757 -7.351a1 1 0 0 1 .936 -.649h12.307a1 1 0 0 1 .986 1.164l-.996 5.211a2 2 0 0 1 -1.964 1.625h-14.026a2 2 0 0 1 -2 -2v-11a2 2 0 0 1 2 -2h4l3 3h7a2 2 0 0 1 2 2v2" /></symbol><symbol id="i-scissors" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M6 7m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /> <path d="M6 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /> <path d="M8.6 8.6l10.4 10.4" /> <path d="M8.6 15.4l10.4 -10.4" /></symbol><symbol id="i-alert-triangle" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M12 9v4" /> <path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" /> <path d="M12 16h.01" /></symbol><symbol id="i-list-check" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M3.5 5.5l1.5 1.5l2.5 -2.5" /> <path d="M3.5 11.5l1.5 1.5l2.5 -2.5" /> <path d="M3.5 17.5l1.5 1.5l2.5 -2.5" /> <path d="M11 6l9 0" /> <path d="M11 12l9 0" /> <path d="M11 18l9 0" /></symbol><symbol id="i-info-circle" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" /> <path d="M12 9h.01" /> <path d="M11 12h1v4h1" /></symbol><symbol id="i-gauge" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /> <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /> <path d="M13.41 10.59l2.59 -2.59" /> <path d="M7 12a5 5 0 0 1 5 -5" /></symbol><symbol id="i-refresh" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /> <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></symbol><symbol id="i-search" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /> <path d="M21 21l-6 -6" /></symbol><symbol id="i-player-stop" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M5 5m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z" /></symbol><symbol id="i-minus" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M5 12l14 0" /></symbol><symbol id="i-square" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /></symbol><symbol id="i-external-link" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" /> <path d="M11 13l9 -9" /> <path d="M15 4h5v5" /></symbol><symbol id="i-bulb" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7" /> <path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3" /> <path d="M9.7 17l4.6 0" /></symbol><symbol id="i-player-pause" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" /> <path d="M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" /></symbol><symbol id="i-player-play" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M7 4v16l13 -8z" /></symbol><symbol id="i-trash" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M4 7l16 0" /> <path d="M10 11l0 6" /> <path d="M14 11l0 6" /> <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /> <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></symbol><symbol id="i-brand-github" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" /></symbol><symbol id="i-checks" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M7 12l5 5l10 -10" /> <path d="M2 12l5 5m5 -5l5 -5" /></symbol><symbol id="i-hourglass" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M6.5 7h11" /> <path d="M6.5 17h11" /> <path d="M6 20v-2a6 6 0 1 1 12 0v2a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1z" /> <path d="M6 4v2a6 6 0 1 0 12 0v-2a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1z" /></symbol><symbol id="i-loader-2" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M12 3a9 9 0 1 0 9 9" /></symbol><symbol id="i-file-music" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M14 3v4a1 1 0 0 0 1 1h4" /> <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /> <path d="M11 16m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /> <path d="M12 16l0 -5l2 1" /></symbol><symbol id="i-heart" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" fill="none"/> <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" /></symbol></svg>
+<div class="app" id="app">
+<div style="flex:1;display:flex;min-height:0">
+<div class="side">
+<div title="Início" role="button" tabindex="0" id="logoBtn" style="width:42px;height:42px;border-radius:11px;background:var(--ac);display:flex;align-items:center;justify-content:center;margin-bottom:12px;cursor:pointer"><svg width="28" height="24" viewBox="0 0 1000 860" aria-label="ZTube, início" style="color:#fff"><use href="#zlogo"/></svg></div>
+<div class="nav" data-p="pgFila" title="Downloads" tabindex="0" style="position:relative"><svg class="i" style="" aria-hidden="true"><use href="#i-list-check"/></svg><span class="badge" id="filaBadge" style="display:none">0</span></div>
+<div class="nav" data-p="pgReq" title="Requisitos" tabindex="0" style="position:relative"><svg class="i" style="" aria-hidden="true"><use href="#i-package"/></svg><span class="dotw" id="reqDot" style="display:none"></span></div>
+<div class="nav" data-p="pgDicas" title="Dicas" tabindex="0"><svg class="i" style="" aria-hidden="true"><use href="#i-bulb"/></svg></div>
+<div style="flex:1"></div>
+<div class="nav" id="tema" title="Trocar tema" tabindex="0"><svg class="i" style="" aria-hidden="true"><use href="#i-moon"/></svg></div>
+</div>
+
+<div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0">
+
+<!-- ================= INÍCIO ================= -->
+<div class="page on" id="pgDown">
+<div><div style="font-size:22px;font-weight:700">O que vamos baixar?</div><div class="mu" style="font-size:13.5px">Vídeos, lives, playlists ou canais do YouTube</div></div>
+<div style="flex:1;display:grid;grid-template-columns:1.12fr 1fr;gap:18px;min-height:0">
+
+<div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+<div class="card">
+<div class="h"><svg class="i" style="" aria-hidden="true"><use href="#i-link"/></svg>Link</div>
+<div class="r"><div class="fld"><svg class="i" style="font-size:19px;color:#e5322d" aria-hidden="true"><use href="#i-brand-youtube"/></svg><input id="url" aria-label="Link do YouTube" placeholder="Cole aqui o link do YouTube" spellcheck="false" autocomplete="off"><span id="clr" title="Limpar" style="display:none;cursor:pointer;color:var(--mu)"><svg class="i" style="font-size:15px" aria-hidden="true"><use href="#i-x"/></svg></span></div>
+<button id="colar"><svg class="i" style="" aria-hidden="true"><use href="#i-clipboard"/></svg>Colar</button></div>
+<div class="media" id="media"><div class="thumb" id="th"></div><div style="min-width:0;flex:1"><div class="tag" id="tg"><svg class="i" style="" aria-hidden="true"><use href="#i-link"/></svg><span id="tgt"></span></div><div style="font-size:14px;font-weight:600;margin:3px 0 2px;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical" id="mt"></div><div class="mu" id="mm"></div></div></div>
+</div>
+<div class="card" style="flex:1">
+<div class="h"><svg class="i" style="" aria-hidden="true"><use href="#i-adjustments-horizontal"/></svg>Formato</div>
+<div class="fmt"><div class="fc on" id="bV" tabindex="0" role="radio"><span class="dot"></span><svg class="i" style="" aria-hidden="true"><use href="#i-video"/></svg>Vídeo (MP4)</div>
+<div class="fc" id="bA" tabindex="0" role="radio"><span class="dot"></span><svg class="i" style="" aria-hidden="true"><use href="#i-music"/></svg>Só áudio</div></div>
+<div class="selw"><select id="qual" aria-label="Qualidade"></select></div>
+<div class="r mu" style="margin-top:10px;align-items:flex-start;line-height:1.45"><svg class="i" style="font-size:16px;margin-top:1px" aria-hidden="true"><use href="#i-info-circle"/></svg><span id="qd"></span></div>
+</div>
+<div class="card">
+<div class="h"><svg class="i" style="" aria-hidden="true"><use href="#i-folder"/></svg>Salvar em<span style="flex:1"></span><a class="lk" tabindex="0" id="abrirPasta"><svg class="i" style="" aria-hidden="true"><use href="#i-external-link"/></svg>Abrir pasta</a></div>
+<div class="r"><div class="fld"><svg class="i" style="font-size:18px;color:var(--mu)" aria-hidden="true"><use href="#i-folder"/></svg><input id="pasta" aria-label="Pasta" spellcheck="false"></div>
+<button id="escolher"><svg class="i" style="" aria-hidden="true"><use href="#i-folder-open"/></svg>Escolher pasta</button></div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+<div class="card ctx" id="xFat">
+<div class="r" style="margin-bottom:4px"><svg class="i" style="font-size:18px;color:var(--ac)" aria-hidden="true"><use href="#i-scissors"/></svg><span style="font-size:13.5px;font-weight:600">Fatiar em partes</span><div class="sw" id="sw" style="margin-left:auto" tabindex="0" role="switch" aria-label="Fatiar em partes"></div></div>
+<div class="mu" id="fOff">Desligado: baixa o arquivo inteiro.</div>
+<div id="fBody" style="margin-top:10px;display:none">
+<div class="selw" style="margin-bottom:12px"><select id="fonte" aria-label="Onde procurar os tempos"><option value="auto">Todas (busca automática)</option><option value="chap">Capítulos do vídeo</option><option value="desc">Tempos da descrição</option><option value="pin">Comentário fixado</option><option value="sil">Por silêncio</option><option value="man">Manual</option></select></div>
+<div id="fState"></div>
+</div></div>
+<div class="card ctx" id="xLive">
+<div class="h"><svg class="i" style="" aria-hidden="true"><use href="#i-broadcast"/></svg>Começar a baixar</div>
+<div style="display:flex;flex-direction:column;gap:12px"><label class="o"><input type="radio" name="lv" value="ini" checked>Do início da live</label>
+<label class="o"><input type="radio" name="lv" value="from" id="lvFrom">A partir de <span class="fld" style="flex:none;width:110px;height:34px"><input id="lvTime" value="00:00:00" aria-label="Tempo de início"></span></label></div></div>
+<div class="card ctx" id="xLista">
+<div class="h"><svg class="i" style="" aria-hidden="true"><use href="#i-playlist"/></svg><span id="lTit"></span></div>
+<div class="mu" style="font-size:13.5px;line-height:1.5" id="lTxt"></div></div>
+<div class="card ctx" id="xMix">
+<div class="h"><svg class="i" style="" aria-hidden="true"><use href="#i-list-details"/></svg>Esse vídeo faz parte de uma playlist</div>
+<div style="display:flex;flex-direction:column;gap:12px"><label class="o"><input type="radio" name="mx" value="one" checked>Só este vídeo</label><label class="o"><input type="radio" name="mx" value="all">A playlist inteira</label></div></div>
+
+<div class="card" style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div class="h" style="margin-bottom:6px"><svg class="i" style="" aria-hidden="true"><use href="#i-history"/></svg>Recentes<span style="flex:1"></span><a class="lk" tabindex="0" id="verTodos" style="font-weight:600">Ver todos</a></div>
+<div id="recList" style="overflow:auto;min-height:0;flex:1;padding-right:4px"></div>
+</div>
+<div class="card">
+<button class="pri" id="go" style="width:100%;height:52px;font-size:15.5px;border-radius:11px;margin-bottom:14px"></button>
+<div class="r"><div class="pgb" id="pgbMain"><div id="bar"></div></div><span class="pill" id="pct">0%</span></div>
+<div class="r" style="margin-top:12px"><span id="stiw" style="display:flex"></span><span id="st" style="font-size:13.5px;flex:1;min-width:0">Aguardando download</span><span style="font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:5px;white-space:nowrap" id="spd"></span></div>
+<div id="errRow" style="margin-top:10px;display:none"><div class="r" style="gap:16px"><a class="lk" tabindex="0" id="errLk"><svg class="i" style="" aria-hidden="true"><use href="#i-list-details"/></svg>Ver o que aconteceu</a><a class="lk" tabindex="0" id="errRetry"><svg class="i" style="" aria-hidden="true"><use href="#i-refresh"/></svg>Tentar de novo</a></div><div id="log" class="logbox" style="display:none"></div></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ================= DOWNLOADS ================= -->
+<div class="page" id="pgFila">
+<div class="r"><div><div style="font-size:22px;font-weight:700">Downloads</div><div class="mu" style="font-size:13.5px">Acompanhe o que está baixando e o que já terminou</div></div><span style="flex:1"></span>
+<div class="tabs"><div class="on" data-t="and"><svg class="i" style="" aria-hidden="true"><use href="#i-download"/></svg>Em andamento <span class="cnt" id="cAnd">0</span></div><div data-t="con"><svg class="i" style="" aria-hidden="true"><use href="#i-checks"/></svg>Concluídos <span class="cnt" id="cCon">0</span></div></div></div>
+<div id="tAnd" style="display:flex;flex-direction:column;gap:10px;overflow:auto;min-height:0;flex:1"></div>
+<div id="tCon" style="display:none;flex-direction:column;gap:10px;overflow:auto;min-height:0;flex:1"></div>
+</div>
+
+<!-- ================= REQUISITOS ================= -->
+<div class="page" id="pgReq">
+<div class="r"><div><div style="font-size:22px;font-weight:700">Requisitos</div><div class="mu" style="font-size:13.5px">Ferramentas que o ZTube usa para baixar e converter</div></div><span style="flex:1"></span><button id="reCheck"><svg class="i" style="" aria-hidden="true"><use href="#i-refresh"/></svg>Verificar de novo</button></div>
+<div class="card sum"><div class="sumi" id="sumI"></div><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700" id="sumT">Verificando…</div><div class="mu" id="sumS" style="margin-top:2px">Procurando as ferramentas e conferindo as versões.</div></div><button class="pri" id="allBtn" style="display:none"><svg class="i" style="" aria-hidden="true"><use href="#i-download"/></svg>Instalar e atualizar tudo</button></div>
+<div id="reqList" style="display:flex;flex-direction:column;gap:10px"></div>
+<div class="mu r" style="margin-top:auto;align-items:flex-start;line-height:1.5"><svg class="i" style="font-size:17px;color:var(--ok);margin-top:1px" aria-hidden="true"><use href="#i-shield-check"/></svg><span>As ferramentas vêm direto das páginas oficiais de cada projeto e são conferidas antes de usar. Ficam guardadas em <b style="color:var(--tx);font-weight:600">%LOCALAPPDATA%\ZTube\ferramentas</b>, sem mexer no resto do Windows. <a class="lk" tabindex="0" id="openTools"><svg class="i" style="" aria-hidden="true"><use href="#i-external-link"/></svg>Abrir pasta</a></span></div>
+</div>
+
+<!-- ================= DICAS ================= -->
+<div class="page" id="pgDicas" style="overflow:auto">
+<div><div style="font-size:22px;font-weight:700">Dicas</div><div class="mu" style="font-size:13.5px">Como tirar o melhor do ZTube</div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div class="card tip"><h3><svg class="i"  aria-hidden="true"><use href="#i-cloud-download"/></svg>Como baixar</h3><ol><li>Copie o link no YouTube.</li><li>Clique em Colar: o ZTube identifica o tipo de link sozinho.</li><li>Escolha vídeo ou só áudio e a pasta.</li><li>Clique em Baixar ou aperte Enter.</li></ol></div>
+<div class="card tip"><h3><svg class="i"  aria-hidden="true"><use href="#i-scissors"/></svg>Fatiar em partes<span class="lic">Código aberto, domínio público (Unlicense)</span></h3><p>Ideal para packs de efeitos e músicas. O ZTube procura os tempos nos capítulos, na descrição e no comentário fixado. Em Explorar fatias, dá para buscar, desmarcar e renomear cada parte.</p></div>
+<div class="card tip"><h3><svg class="i"  aria-hidden="true"><use href="#i-broadcast"/></svg>Lives</h3><p>Dá para gravar desde o início, a partir de um horário ou de agora em diante. Com a live ainda no ar, deixe o ZTube aberto até a transmissão terminar.</p></div>
+<div class="card tip"><h3><svg class="i"  aria-hidden="true"><use href="#i-playlist"/></svg>Canais e playlists</h3><p>Cole o link do canal ou da playlist e tudo vai para a pasta escolhida. Vídeos que já estão na pasta não são baixados de novo; se você apagar um, ele volta no próximo download.</p></div>
+<div class="card tip"><h3><svg class="i"  aria-hidden="true"><use href="#i-adjustments-horizontal"/></svg>Qual formato escolher</h3><p>Para editar no Premiere ou no After Effects, use “Compatível com editores”. Para som de edição, prefira WAV ou FLAC. Para ouvir no celular, MP3 resolve.</p></div>
+<div class="card tip"><h3><svg class="i"  aria-hidden="true"><use href="#i-refresh"/></svg>Se der erro</h3><p>O YouTube muda com frequência. Se um download falhar do nada, clique em Atualizar yt-dlp no rodapé e tente de novo. Vídeos privados ou só para membros não podem ser baixados.</p></div>
+</div>
+<div class="sec"><svg class="i" style="" aria-hidden="true"><use href="#i-code"/></svg>Ferramentas usadas</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div class="card tip"><h3><svg class="i" style="" aria-hidden="true"><use href="#i-cloud-download"/></svg>yt-dlp</h3><p>É o motor dos downloads: lê o link, encontra o vídeo e baixa na qualidade escolhida. É código aberto, mantido por uma comunidade grande e ativa, e recebe atualizações frequentes para acompanhar as mudanças do YouTube. <a class="lk" href="https://github.com/yt-dlp/yt-dlp" target="_blank" rel="noopener">Página do projeto</a></p></div>
+<div class="card tip"><h3><svg class="i" style="" aria-hidden="true"><use href="#i-scissors"/></svg>FFmpeg<span class="lic">Código aberto (LGPL/GPL)</span></h3><p>Junta o vídeo com o áudio, converte os formatos (MP3, WAV, FLAC…) e faz os cortes das fatias. É o padrão da indústria em processamento de áudio e vídeo e está por trás de muitos programas conhecidos. <a class="lk" href="https://ffmpeg.org" target="_blank" rel="noopener">Página do projeto</a></p></div>
+<div class="card tip"><h3><svg class="i" style="" aria-hidden="true"><use href="#i-code"/></svg>Deno<span class="lic">Código aberto (MIT)</span></h3><p>Um interpretador de JavaScript que o yt-dlp usa para conseguir ler as páginas do YouTube. Não abre janelas nem fica rodando: só trabalha quando o yt-dlp precisa. O ZTube instala ele junto com o yt-dlp, sem precisar de um passo a mais. Foi criado pelo mesmo autor do Node.js. <a class="lk" href="https://deno.com" target="_blank" rel="noopener">Página do projeto</a></p></div>
+<div class="card tip"><h3><svg class="i" style="" aria-hidden="true"><use href="#i-brand-windows"/></svg>WebView2<span class="lic">Componente da Microsoft</span></h3><p>É o que desenha a interface do ZTube, usando o mesmo motor do Microsoft Edge. Já vem instalado no Windows 10 e 11 e é atualizado pela própria Microsoft junto com o sistema.</p></div>
+</div>
+<div class="sec"><svg class="i" style="" aria-hidden="true"><use href="#i-shield-check"/></svg>É seguro?</div>
+<div class="card tip"><ul>
+<li><b style="color:var(--tx)">Tudo roda no seu computador.</b> O ZTube não tem conta, não coleta dados e só se conecta ao YouTube, para baixar, e ao GitHub, para buscar atualizações das ferramentas.</li>
+<li><b style="color:var(--tx)">Ferramentas oficiais.</b> O yt-dlp, o FFmpeg e o Deno são baixados direto das páginas oficiais de cada projeto, e o ZTube confere se os arquivos chegaram intactos antes de usar.</li>
+<li><b style="color:var(--tx)">Código aberto.</b> O código do ZTube também fica público no GitHub, então qualquer pessoa pode conferir o que ele faz.</li>
+<li><b style="color:var(--tx)">Aviso do Windows.</b> Na primeira vez, pode aparecer “O Windows protegeu o computador”. Isso acontece com programas novos que não têm assinatura digital paga. Clique em “Mais informações” e depois em “Executar assim mesmo”, e baixe o ZTube só da página oficial dele no GitHub.</li>
+<li><b style="color:var(--tx)">Uso responsável.</b> Os termos do YouTube não permitem baixar vídeos fora dos recursos oficiais. Use o ZTube só para conteúdo que você tem direito de baixar.</li>
+</ul></div>
+<div class="card tip"><h3><svg class="i" style="" aria-hidden="true"><use href="#i-heart"/></svg>Créditos</h3><p>O ZTube foi criado por Rosani Ferreira e funciona graças ao trabalho das comunidades do yt-dlp, do FFmpeg e do Deno.</p></div>
+</div>
+
+<div class="foot">Criado por <span style="color:var(--tx);font-weight:600">Rosani Ferreira</span><span style="flex:1"></span><span class="mu" style="font-size:12px" id="ver"></span><span style="width:14px"></span><a class="lk" tabindex="0" id="footUp"><svg class="i" style="" aria-hidden="true"><use href="#i-refresh"/></svg>Atualizar yt-dlp</a></div>
+</div>
+</div>
+
+<!-- ================= EXPLORAR FATIAS ================= -->
+<div class="ovl" id="ov" style="display:none"><div class="dlg" role="dialog" aria-label="Explorar fatias">
+<div class="r" style="padding:16px 20px;border-bottom:1px solid var(--bd);font-size:15px;font-weight:700"><svg class="i" style="font-size:19px;color:var(--ac)" aria-hidden="true"><use href="#i-list-check"/></svg>Explorar fatias<span style="flex:1"></span><span id="x" style="cursor:pointer;color:var(--mu);display:flex"><svg class="i" style="font-size:19px" aria-hidden="true"><use href="#i-x"/></svg></span></div>
+<div style="padding:14px 20px 0">
+<div class="r" style="margin-bottom:10px"><div class="fld"><svg class="i" style="font-size:17px;color:var(--mu)" aria-hidden="true"><use href="#i-search"/></svg><input id="q" placeholder="Buscar: explosão, moeda…" aria-label="Buscar fatias"></div>
+<button id="aT">Todas</button><button id="aN">Nenhuma</button><button id="aI">Inverter</button></div>
+<div class="r mu" style="margin-bottom:6px"><span id="cnt"></span><span style="margin-left:auto" id="tot"></span></div></div>
+<div id="lst" style="overflow:auto;padding:0 20px;flex:1;min-height:0"></div>
+<div class="r" style="justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--bd)"><button id="cc">Cancelar</button><button class="pri" id="uu"></button></div>
+</div></div>
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const I = (n, s, st) => '<svg class="i" style="font-size:' + (s || 16) + 'px;' + (st || '') + '" aria-hidden="true"><use href="#i-' + n + '"/></svg>';
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const html = document.documentElement;
+
+// ---------------- estado ----------------
+const S = {
+  settings: { pasta: '', tema: '', modo: 'v', qualidade: 0, audio: 0 },
+  url: '', token: 0, kind: '', info: null, probing: false, probeErr: '',
+  segs: [], segSrc: '', pinSegs: undefined, pinBusy: false,
+  jobs: {}, curJob: '', curSnap: null,
+  history: [], tools: [], hasYt: true, hasFF: true,
+  draft: null, tab: 'and'
+};
+
+const Q = {
+  v: ['Compatível com editores (até 1080p)', 'Máxima qualidade (até 4K)', '720p (mais leve)', '480p (bem leve)'],
+  a: ['WAV (para edição)', 'MP3 (leve)', 'M4A', 'FLAC (sem perda)', 'OPUS (original)']
+};
+const QD = {
+  v: ['Vídeo em H.264: abre direto no Premiere e no After Effects.', 'Melhor resolução disponível. Alguns editores podem não abrir.', 'Arquivo menor, ainda com boa qualidade.', 'Bem leve, bom para referência rápida.'],
+  a: ['Sem compressão, ideal para edição. O arquivo fica pesado.', 'Leve e toca em qualquer lugar.', 'Leve, com boa qualidade.', 'Sem perda de qualidade e menor que o WAV.', 'Formato original do YouTube, com o menor tamanho.']
+};
+
+// ---------------- utilidades ----------------
+function clock(s) {
+  s = Math.max(0, Math.round(s || 0));
+  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60;
+  return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0');
+}
+function fdur(s) {
+  s = Math.round(s || 0);
+  const h = Math.floor(s / 3600), m = Math.round(s % 3600 / 60);
+  return h ? h + 'h ' + m + 'min' : (m ? m + 'min' : s + 's');
+}
+function ago(ts) {
+  if (!ts) return '';
+  const min = Math.max(0, Math.round((Date.now() / 1000 - ts) / 60));
+  if (min < 60) return min + 'min';
+  return Math.floor(min / 60) + 'h ' + (min % 60) + 'min';
+}
+function when(ms) {
+  const d = new Date(ms), now = new Date();
+  const hm = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  const day = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diff = Math.round((day(now) - day(d)) / 864e5);
+  if (diff === 0) return 'Hoje, ' + hm;
+  if (diff === 1) return 'Ontem, ' + hm;
+  const mes = ['jan.', 'fev.', 'mar.', 'abr.', 'maio', 'jun.', 'jul.', 'ago.', 'set.', 'out.', 'nov.', 'dez.'][d.getMonth()];
+  return d.getDate() + ' de ' + mes + (d.getFullYear() !== now.getFullYear() ? ' de ' + d.getFullYear() : '');
+}
+let toastT = 0;
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 3500);
+}
+function saveSettings() { window.zt_saveSettings && zt_saveSettings(S.settings); }
+
+// mesmos padrões do motor: "0:12 Moeda" ou "Moeda - 0:12"
+function parseStamps(text, dur) {
+  const r1 = /^\s*(?:[-–•*·▶►]\s*)?[\(\[]?((?:\d{1,2}:)?\d{1,2}:\d{2})[\)\]]?\s*(?:[-–—:|.]\s*)?(.*)$/;
+  const r2 = /^\s*(?:[-–•*·▶►]\s*)?(.+?)\s*[-–—:|]?\s*[\(\[]?((?:\d{1,2}:)?\d{1,2}:\d{2})[\)\]]?\s*$/;
+  const pc = s => s.split(':').reduce((a, x) => a * 60 + Number(x), 0);
+  const list = [], seen = {};
+  for (let line of String(text || '').split('\n')) {
+    line = line.trim(); if (!line) continue;
+    let t = -1, name = '', m;
+    if ((m = line.match(r1))) { t = pc(m[1]); name = m[2]; }
+    else if ((m = line.match(r2))) { t = pc(m[2]); name = m[1]; }
+    if (t < 0 || isNaN(t) || seen[t] || (dur > 0 && t >= dur)) continue;
+    seen[t] = 1; list.push({ t, name: name.replace(/^[\s\-–—:|]+|[\s\-–—:|]+$/g, '') });
+  }
+  if (list.length < 2) return [];
+  list.sort((a, b) => a.t - b.t);
+  return list.map((x, i) => ({ a: x.t, b: i + 1 < list.length ? list[i + 1].t : (dur || 0), name: x.name || ('Parte ' + (i + 1)), s: true }));
+}
+
+// ---------------- navegação ----------------
+let curPage = 'pgDown';
+function page(p) {
+  curPage = p;
+  document.querySelectorAll('.page').forEach(e => e.classList.toggle('on', e.id === p));
+  document.querySelectorAll('.nav[data-p]').forEach(n => n.classList.toggle('on', n.dataset.p === p));
+  if (p === 'pgFila') renderFila();
+}
+document.querySelectorAll('.nav[data-p]').forEach(n => {
+  n.onclick = () => page(n.dataset.p);
+  n.onkeydown = e => { if (e.key === 'Enter') page(n.dataset.p); };
+});
+$('logoBtn').onclick = () => page('pgDown');
+$('logoBtn').onkeydown = e => { if (e.key === 'Enter') page('pgDown'); };
+
+// ---------------- tema ----------------
+const isDark = () => html.dataset.theme ? html.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+function syncTema() {
+  $('tema').innerHTML = I(isDark() ? 'sun' : 'moon', 22);
+  window.zt_darkTitle && zt_darkTitle(isDark());
+}
+$('tema').onclick = () => {
+  const d = !isDark();
+  html.dataset.theme = d ? 'dark' : 'light';
+  S.settings.tema = html.dataset.theme; saveSettings(); syncTema();
+};
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (!html.dataset.theme) syncTema(); });
+
+// links externos (Dicas) abrem no navegador
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href]');
+  if (a && /^https?:/.test(a.getAttribute('href'))) { e.preventDefault(); window.zt_url && zt_url(a.getAttribute('href')); }
+});
+
+// ---------------- formato ----------------
+function fillQ() {
+  const m = S.settings.modo === 'a' ? 'a' : 'v';
+  const idx = m === 'a' ? S.settings.audio : S.settings.qualidade;
+  $('qual').innerHTML = Q[m].map((o, i) => '<option value="' + i + '">' + o + '</option>').join('');
+  $('qual').value = String(Math.min(Math.max(idx || 0, 0), Q[m].length - 1));
+  $('qd').textContent = QD[m][$('qual').selectedIndex] || '';
+  $('bA').classList.toggle('on', m === 'a'); $('bV').classList.toggle('on', m !== 'a');
+}
+$('qual').onchange = () => {
+  if (S.settings.modo === 'a') S.settings.audio = +$('qual').value; else S.settings.qualidade = +$('qual').value;
+  $('qd').textContent = QD[S.settings.modo === 'a' ? 'a' : 'v'][$('qual').selectedIndex] || '';
+  saveSettings();
+};
+function setModo(m) { S.settings.modo = m; fillQ(); saveSettings(); }
+$('bV').onclick = () => setModo('v'); $('bA').onclick = () => setModo('a');
+$('bV').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') setModo('v'); };
+$('bA').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') setModo('a'); };
+
+// ---------------- pasta ----------------
+$('pasta').onchange = () => { S.settings.pasta = $('pasta').value.trim(); saveSettings(); };
+$('escolher').onclick = async () => {
+  const p = await zt_pickFolder($('pasta').value.trim());
+  if (p) { $('pasta').value = p; S.settings.pasta = p; saveSettings(); }
+};
+$('abrirPasta').onclick = () => zt_openFolder($('pasta').value.trim());
+
+// ---------------- link ----------------
+let linkT = 0;
+$('url').addEventListener('input', () => {
+  $('clr').style.display = $('url').value ? 'flex' : 'none';
+  clearTimeout(linkT); linkT = setTimeout(() => onLink($('url').value), 700);
+});
+$('url').addEventListener('keydown', e => { if (e.key === 'Enter') { clearTimeout(linkT); if ($('url').value.trim() !== S.url) onLink($('url').value); else download(); } });
+$('clr').onclick = () => { $('url').value = ''; $('clr').style.display = 'none'; onLink(''); $('url').focus(); };
+$('colar').onclick = async () => {
+  try {
+    let t = window.zt_clipboard ? await zt_clipboard() : '';
+    if (!t && navigator.clipboard) t = (await navigator.clipboard.readText()).trim();
+    if (t) { $('url').value = t; $('clr').style.display = 'flex'; clearTimeout(linkT); onLink(t); }
+    else toast('A área de transferência está vazia.');
+  } catch (e) { $('url').focus(); toast('Não consegui ler a área de transferência. Use Ctrl+V no campo.'); }
+};
+
+async function onLink(raw) {
+  const u = String(raw || '').trim();
+  if (u === S.url) return;
+  S.url = u; S.token++; S.info = null; S.probeErr = ''; S.segs = []; S.segSrc = ''; S.pinSegs = undefined; S.pinBusy = false;
+  $('sw').classList.remove('on');
+  if (!u) { S.kind = ''; S.probing = false; renderLink(); return; }
+  if (!/^https?:\/\//i.test(u)) { S.kind = ''; S.probing = false; S.probeErr = 'Isso não parece um link. Ele precisa começar com https://'; renderLink(); return; }
+  const c = await zt_classify(u);
+  if (u !== S.url) return;
+  S.kind = c.kind; S.probing = true; renderLink();
+  zt_probe(S.token, u);
+}
+
+function kindLabel(k, info) {
+  if (k === 'video') return info && info.chapters && info.chapters.length ? ['movie', 'Vídeo com capítulos'] : ['movie', 'Vídeo'];
+  return { live: ['broadcast', 'Live'], canal: ['user-circle', 'Canal'], playlist: ['playlist', 'Playlist'], mix: ['list-details', 'Vídeo dentro de uma playlist'] }[k] || ['link', 'Link'];
+}
+
+function renderLink() {
+  const th = $('th'), info = S.info, k = S.kind;
+  th.className = 'thumb' + (k === 'canal' ? ' round' : '');
+  let tag, title, sub, icon;
+  if (!S.url) { icon = 'link'; tag = 'Nenhum link ainda'; title = 'Cole um link do YouTube para começar'; sub = 'Vídeo, live, playlist ou canal'; }
+  else if (S.probeErr) { icon = 'alert-triangle'; tag = 'Não deu para ler'; title = S.probeErr; sub = ''; }
+  else if (S.probing) { const kl = kindLabel(k); icon = kl[0]; tag = kl[1] + ' detectado'; title = 'Lendo as informações do link…'; sub = S.url; }
+  else if (info) {
+    const kl = kindLabel(info.kind, info); icon = kl[0]; tag = kl[1]; title = info.title || S.url;
+    const parts = [info.uploader];
+    if (info.kind === 'video' && info.chapters && info.chapters.length) parts.push(info.chapters.length + ' capítulos');
+    if (info.kind === 'live' && info.liveSince) parts.push('no ar há ' + ago(info.liveSince));
+    if ((info.kind === 'canal' || info.kind === 'playlist') && info.count) parts.push(info.count + ' vídeos');
+    sub = parts.filter(Boolean).join(', ');
+  }
+  let inner = '';
+  if (info && info.thumb && !S.probeErr) inner = '<img src="' + esc(info.thumb) + '" alt="" referrerpolicy="no-referrer" onerror="this.remove()">';
+  inner += I(icon, k === 'canal' ? 22 : 24, 'position:absolute');
+  if (info && info.kind === 'live') inner += '<span class="live">Ao vivo</span>';
+  if (info && info.duration && (info.kind === 'video' || info.kind === 'mix')) inner += '<span class="dur">' + clock(info.duration) + '</span>';
+  th.innerHTML = inner;
+  const tagIcon = S.probing ? I('loader-2', 14, '') : I(S.probeErr ? 'alert-triangle' : icon, 14);
+  $('tg').innerHTML = tagIcon + '<span>' + esc(tag) + '</span>';
+  $('tg').classList.toggle('spin1', !!S.probing);
+  $('tg').style.color = S.probeErr ? 'var(--wa)' : '';
+  $('mt').textContent = title;
+  $('mm').textContent = sub || '';
+  renderCtx();
+  renderGo();
+}
+
+// ---------------- opções conforme o tipo ----------------
+function renderCtx() {
+  const k = S.kind, info = S.info;
+  const mixAll = document.querySelector('input[name=mx]:checked').value === 'all';
+  const show = {
+    xFat: !!S.url && !S.probeErr && (k === 'video' || (k === 'mix' && !mixAll)),
+    xLive: k === 'live', xLista: k === 'canal' || k === 'playlist', xMix: k === 'mix'
+  };
+  for (const id in show) $(id).style.display = show[id] ? 'block' : 'none';
+  if (show.xLista) {
+    $('lTit').textContent = k === 'canal' ? 'Baixar o canal inteiro' : 'Baixar a playlist inteira';
+    const n = info && info.count ? (info.count + ' vídeos') : 'Todos os vídeos';
+    $('lTxt').textContent = n + (k === 'canal' ? ' do canal' : ' da playlist') + ' vão para uma pasta própria dentro da pasta escolhida. Os que já estiverem lá não são baixados de novo.';
+  }
+  if (show.xFat) renderFat();
+}
+document.querySelectorAll('input[name=mx]').forEach(r => r.onchange = () => { renderCtx(); renderGo(); });
+
+const fatOn = () => $('sw').classList.contains('on');
+$('sw').onclick = () => { $('sw').classList.toggle('on'); renderFat(); renderGo(); };
+$('sw').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('sw').onclick(); } };
+$('fonte').onchange = () => { S.segSrc = ''; renderFat(); renderGo(); };
+let manualText = '', silLevel = 3;
+
+function pickSegs() {
+  const f = $('fonte').value, info = S.info || {};
+  const ch = info.chapters || [], ds = info.descSegs || [];
+  const want = src => {
+    if (src === 'chap') return ch;
+    if (src === 'desc') return ds;
+    if (src === 'pin') return S.pinSegs || [];
+    if (src === 'man') return parseStamps(manualText, info.duration || 0);
+    return [];
+  };
+  let src = f;
+  if (f === 'auto') {
+    if (ch.length) src = 'chap';
+    else if (ds.length) src = 'desc';
+    else if (S.pinSegs && S.pinSegs.length) src = 'pin';
+    else src = S.pinSegs === undefined ? 'pin?' : 'none';
+  } else if (f === 'pin' && S.pinSegs === undefined) src = 'pin?';
+  if (src === 'pin?') { fetchPinned(); return { src: 'busy' }; }
+  if (src === 'none' || src === 'sil') return { src };
+  const segs = want(src);
+  if (S.segSrc !== src + ':' + segs.length) { S.segs = segs.map(x => ({ ...x, s: true })); S.segSrc = src + ':' + segs.length; }
+  return { src: segs.length || src === 'man' ? src : (f === 'auto' ? 'none' : src + '-empty') };
+}
+
+function fetchPinned() {
+  if (S.pinBusy || !S.info) return;
+  S.pinBusy = true;
+  zt_pinned(S.token, S.info.url, S.info.duration || 0);
+}
+
+function renderFat() {
+  const on = fatOn();
+  $('fBody').style.display = on ? 'block' : 'none';
+  $('fOff').style.display = on ? 'none' : 'block';
+  if (!on) return;
+  const st = $('fState');
+  if (S.probing || !S.info) { st.innerHTML = '<div class="r mu">' + I('loader-2', 16, '') + 'Lendo o link…</div>'; return; }
+  const { src } = pickSegs();
+  const lab = { chap: 'nos capítulos do vídeo', desc: 'na descrição', pin: 'no comentário fixado', man: 'na sua lista' };
+  const found = n => '<div class="r">' + I('circle-check', 18, 'color:var(--ok)') + '<span style="font-size:13.5px">' + n + ' fatias ' + lab[src] + ', <b id="nSel">' + S.segs.filter(x => x.s).length + '</b> selecionadas</span><button style="margin-left:auto" id="abrir">' + I('list-check', 17) + 'Explorar fatias</button></div>';
+  if (src === 'busy') st.innerHTML = '<div class="r mu">' + I('loader-2', 16, '') + 'Procurando tempos no comentário fixado…</div>';
+  else if (src === 'sil') st.innerHTML = '<div class="r" style="gap:12px;flex-wrap:wrap"><span class="o">Sensibilidade</span><input type="range" min="1" max="5" step="1" value="' + silLevel + '" id="silR" style="width:140px"><span class="mu" id="silL"></span></div><div class="mu" style="margin-top:8px;line-height:1.45">O ZTube encontra as pausas entre os sons depois de baixar e separa cada trecho num arquivo.</div>';
+  else if (src === 'man') {
+    st.innerHTML = '<textarea id="man" class="ta" rows="4" placeholder="0:00 Explosão\n0:12 Moeda\n0:19 Tiro de canhão" spellcheck="false">' + esc(manualText) + '</textarea><div id="manRes" style="margin-top:8px"></div>';
+    renderManRes();
+    $('man').oninput = () => { manualText = $('man').value; S.segSrc = ''; pickSegs(); renderManRes(); renderGo(); };
+  }
+  else if (src === 'none' || /-empty$/.test(src)) {
+    const where = { 'chap-empty': 'Esse vídeo não tem capítulos.', 'desc-empty': 'Não achei tempos na descrição.', 'pin-empty': 'Não achei tempos no comentário fixado.' }[src] || 'Não achei tempos no vídeo, na descrição nem no comentário fixado.';
+    st.innerHTML = '<div class="r" style="color:var(--wa);font-size:13.5px;margin-bottom:10px;align-items:flex-start">' + I('alert-triangle', 17, 'margin-top:1px') + '<span>' + where + '</span></div><div class="r" style="gap:10px;flex-wrap:wrap"><button id="toSil">' + I('scissors', 16) + 'Cortar por silêncio</button><button id="toMan">' + I('clipboard', 16) + 'Colar lista de tempos</button></div>';
+    $('toSil').onclick = () => { $('fonte').value = 'sil'; renderFat(); renderGo(); };
+    $('toMan').onclick = () => { $('fonte').value = 'man'; renderFat(); renderGo(); setTimeout(() => $('man') && $('man').focus(), 0); };
+  }
+  else st.innerHTML = found(S.segs.length);
+  if ($('abrir')) $('abrir').onclick = openModal;
+  if ($('silR')) {
+    const lv = ['bem baixa', 'baixa', 'média', 'alta', 'bem alta'];
+    const upd = () => { silLevel = +$('silR').value; $('silL').textContent = lv[silLevel - 1]; };
+    $('silR').oninput = upd; upd();
+  }
+}
+function renderManRes() {
+  const n = S.segs.length, el = $('manRes'); if (!el) return;
+  el.innerHTML = n ? '<div class="r">' + I('circle-check', 18, 'color:var(--ok)') + '<span style="font-size:13.5px">' + n + ' fatias, <b id="nSel">' + S.segs.filter(x => x.s).length + '</b> selecionadas</span><button style="margin-left:auto" id="abrir">' + I('list-check', 17) + 'Explorar fatias</button></div>'
+    : '<div class="mu">Cole uma linha por parte, com o tempo e o nome.</div>';
+  if ($('abrir')) $('abrir').onclick = openModal;
+}
+
+// ---------------- explorar fatias ----------------
+function openModal() { S.draft = S.segs.map(x => ({ ...x })); $('q').value = ''; rl(); $('ov').style.display = 'flex'; setTimeout(() => $('q').focus(), 0); }
+function rl() {
+  const q = $('q').value.trim().toLowerCase();
+  $('lst').innerHTML = S.draft.map((x, i) => !q || x.name.toLowerCase().includes(q) ?
+    '<label class="li"><input type="checkbox" data-i="' + i + '" ' + (x.s ? 'checked' : '') + '><span class="tm">' + clock(x.a) + ' – ' + (x.b > x.a ? clock(x.b) : 'fim') + '</span><span class="fld"><input data-r="' + i + '" value="' + esc(x.name) + '"></span><span class="du">' + (x.b > x.a ? clock(x.b - x.a) : '') + '</span></label>' : '').join('') || '<div class="mu" style="padding:12px 0">Nenhuma fatia com esse nome.</div>';
+  cn();
+}
+function cn() {
+  const s = S.draft.filter(x => x.s);
+  $('cnt').textContent = s.length + ' de ' + S.draft.length + ' selecionadas';
+  $('tot').textContent = 'Duração: ' + fdur(s.reduce((a, x) => a + (x.b > x.a ? x.b - x.a : 0), 0));
+  $('uu').textContent = 'Usar ' + s.length + ' fatias';
+}
+const vis = () => { const q = $('q').value.trim().toLowerCase(); return S.draft.filter(x => !q || x.name.toLowerCase().includes(q)); };
+$('lst').addEventListener('change', e => { const i = e.target.dataset.i; if (i !== undefined) { S.draft[i].s = e.target.checked; cn(); } });
+$('lst').addEventListener('input', e => { const r = e.target.dataset.r; if (r !== undefined) S.draft[r].name = e.target.value; });
+$('q').oninput = rl;
+$('aT').onclick = () => { vis().forEach(x => x.s = true); rl(); };
+$('aN').onclick = () => { vis().forEach(x => x.s = false); rl(); };
+$('aI').onclick = () => { vis().forEach(x => x.s = !x.s); rl(); };
+const closeModal = () => $('ov').style.display = 'none';
+$('x').onclick = closeModal; $('cc').onclick = closeModal;
+$('ov').addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+$('uu').onclick = () => {
+  if (!S.draft.some(x => x.s)) { toast('Selecione ao menos uma fatia.'); return; }
+  S.draft.forEach(x => { x.name = x.name.trim() || 'Sem nome'; });
+  S.segs = S.draft; closeModal(); renderFat(); renderGo();
+};
+
+// ---------------- baixar ----------------
+const sliceOn = () => fatOn() && $('xFat').style.display !== 'none';
+function anyRunning() { return Object.values(S.jobs).some(j => j.state === 'running'); }
+
+function goLabel() {
+  if (!S.hasYt || !S.hasFF) return 'Instalar as ferramentas';
+  let s = 'Baixar';
+  if (sliceOn()) {
+    const src = $('fonte').value;
+    if (src === 'sil') s = 'Baixar e fatiar';
+    else { const n = S.segs.filter(x => x.s).length; s = n ? 'Baixar ' + n + ' partes' : 'Baixar e fatiar'; }
+  } else if (S.kind === 'canal') s = 'Baixar canal';
+  else if (S.kind === 'playlist' || (S.kind === 'mix' && document.querySelector('input[name=mx]:checked').value === 'all')) s = 'Baixar playlist';
+  if (anyRunning()) s = 'Adicionar à fila';
+  return s;
+}
+function renderGo() { $('go').innerHTML = I(!S.hasYt || !S.hasFF ? 'package' : 'download', 20) + esc(goLabel()); }
+
+function status(icon, color, text, speed) {
+  $('stiw').innerHTML = I(icon, 17, 'color:' + color);
+  $('st').innerHTML = text; $('st').style.color = color === 'var(--mu)' || color === 'var(--ac)' ? '' : color;
+  $('spd').innerHTML = speed || '';
+}
+
+async function download() {
+  if (!S.hasYt || !S.hasFF) { page('pgReq'); return; }
+  const u = $('url').value.trim();
+  if (!u) { toast('Cole um link primeiro.'); $('url').focus(); return; }
+  if (u !== S.url) { clearTimeout(linkT); await onLink(u); }
+  if (S.probeErr) { toast(S.probeErr); return; }
+  const folder = $('pasta').value.trim();
+  if (!folder) { toast('Escolha a pasta onde salvar.'); return; }
+  const info = S.info || {};
+  const mixAll = document.querySelector('input[name=mx]:checked').value === 'all';
+  let slice = sliceOn(), src = $('fonte').value;
+  if (slice && src !== 'sil') {
+    if (S.probing || !S.info) { toast('Espere o ZTube terminar de ler o link.'); return; }
+    if (!S.segs.length) { toast('Não há tempos para fatiar. Escolha “Por silêncio” ou “Manual”.'); return; }
+    if (!S.segs.some(x => x.s)) { toast('Selecione ao menos uma fatia.'); return; }
+  }
+  let liveFrom = '';
+  if (S.kind === 'live' && $('lvFrom').checked) {
+    liveFrom = $('lvTime').value.trim();
+    if (!/^(\d{1,2}:)?\d{1,2}:\d{2}$/.test(liveFrom)) { toast('Use o formato 01:20:00 no horário da live.'); return; }
+  }
+  const req = {
+    url: info.url || u, kind: info.kind || S.kind || 'video', title: info.title || '', uploader: info.uploader || '',
+    thumb: info.thumb || '', duration: info.duration || 0,
+    mode: S.settings.modo === 'a' ? 'a' : 'v', quality: S.settings.qualidade || 0, audio: S.settings.audio || 0,
+    folder, liveFrom, mixAll, slice,
+    sliceSrc: src === 'sil' ? 'silence' : 'segs', segments: slice && src !== 'sil' ? S.segs : [], silence: silLevel
+  };
+  zt_start(req).then(id => {
+    S.curJob = id; S.curSnap = { id, state: 'queued', req };
+    renderDl();
+    if (anyRunning()) toast('Adicionado à fila. Acompanhe em Downloads.');
+  });
+}
+$('go').onclick = download;
+
+function renderDl() {
+  const j = S.curSnap;
+  const bar = $('pgbMain');
+  bar.classList.remove('ind');
+  $('errRow').style.display = 'none';
+  if (!j) { setP(0); status('info-circle', 'var(--mu)', 'Aguardando download'); renderGo(); return; }
+  const cancel = ' <a class="lk" tabindex="0" id="cancelCur" style="margin-left:8px">Cancelar</a>';
+  if (j.state === 'queued') { setP(0); status('hourglass', 'var(--mu)', 'Na fila: começa quando o download atual terminar.' + cancel); }
+  else if (j.state === 'running') {
+    if (j.indet) { bar.classList.add('ind'); $('pct').textContent = '…'; } else setP(j.pct || 0);
+    const item = j.item ? ' <span class="mu">(vídeo ' + esc(j.item) + ')</span>' : '';
+    const pct = j.indet ? '' : ' ' + Math.floor(j.pct || 0) + '%';
+    const size = j.size && !j.indet ? ' <span class="mu">(' + esc(j.size) + ')</span>' : (j.indet && j.size ? ' <span class="mu">' + esc(j.size) + '</span>' : '');
+    const spd = j.speed ? I('gauge', 18, 'color:var(--mu)') + esc(j.speed) : '';
+    status('download', 'var(--ac)', '<b>' + esc(j.stage || 'Baixando') + '…</b>' + pct + size + item + cancel, spd);
+  }
+  else if (j.state === 'done') {
+    setP(100);
+    const what = j.parts ? j.parts + ' partes salvas' : 'Pronto! Salvo';
+    status('circle-check', 'var(--ok)', what + ' <a class="lk" tabindex="0" id="openDone">Abrir</a>');
+  }
+  else if (j.state === 'error') {
+    setP(0); status('alert-triangle', 'var(--er)', esc(j.err || 'O download parou com erro.'));
+    $('errRow').style.display = 'block'; $('log').style.display = 'none';
+  }
+  else if (j.state === 'paused') { status('player-pause', 'var(--mu)', 'Pausado. Continue em Downloads.'); }
+  else if (j.state === 'canceled') { setP(0); status('info-circle', 'var(--mu)', 'Download cancelado.'); }
+  if ($('cancelCur')) $('cancelCur').onclick = () => zt_cancel(j.id);
+  if ($('openDone')) $('openDone').onclick = () => {
+    if (!j.path) return;
+    const r = j.req || {};
+    if (j.parts || r.kind === 'canal' || r.kind === 'playlist' || (r.kind === 'mix' && r.mixAll)) zt_openFolder(j.path); else zt_reveal(j.path);
+  };
+  renderGo();
+}
+function setP(p) { $('bar').style.width = p + '%'; $('pct').textContent = Math.floor(p) + '%'; }
+$('errLk').onclick = async () => {
+  const l = $('log');
+  if (l.style.display === 'none') { l.textContent = await zt_log(S.curJob) || 'Sem registro.'; l.style.display = 'block'; l.scrollTop = l.scrollHeight; }
+  else l.style.display = 'none';
+};
+$('errRetry').onclick = () => { if (S.curJob) zt_resume(S.curJob); };
+
+// ---------------- recentes e downloads ----------------
+function thumbHtml(t, kind, small) {
+  const ic = kind === 'audio' ? 'file-music' : kind === 'pasta' ? 'folder' : 'movie';
+  return '<div class="thumb"' + (small ? ' style="width:88px;height:50px"' : '') + '>' + (t ? '<img src="' + esc(t) + '" alt="" referrerpolicy="no-referrer" onerror="this.remove()">' : '') + I(ic, 20, 'position:absolute') + '</div>';
+}
+function openHist(h) { if (h.kind === 'pasta') zt_openFolder(h.path); else zt_open(h.path); }
+
+function renderRec() {
+  const el = $('recList');
+  if (!S.history.length) { el.innerHTML = '<div class="mu" style="padding:8px 0">Seus downloads aparecem aqui.</div>'; return; }
+  el.innerHTML = S.history.slice(0, 5).map((h, i) => '<div class="rec"><div class="ric">' + I(h.kind === 'audio' ? 'file-music' : h.kind === 'pasta' ? 'folder' : 'movie', 17) + '</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="' + esc(h.title) + '">' + esc(h.title) + '</div><div class="mu" style="font-size:12px">' + esc(h.desc) + ', ' + when(h.when) + '</div></div><button class="ib" title="Abrir" data-op="' + i + '">' + I(h.kind === 'pasta' ? 'folder-open' : 'player-play', 15) + '</button><button class="ib" title="Mostrar na pasta" data-rv="' + i + '">' + I('folder', 15) + '</button></div>').join('');
+}
+$('recList').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const h = S.history[b.dataset.op ?? b.dataset.rv]; if (!h) return;
+  if (b.dataset.op !== undefined) openHist(h); else zt_reveal(h.path);
+});
+$('verTodos').onclick = () => { S.tab = 'con'; page('pgFila'); };
+
+function tabSel(t) { S.tab = t; renderFila(); }
+document.querySelectorAll('.tabs div').forEach(d => d.onclick = () => tabSel(d.dataset.t));
+
+const stateTxt = j => ({
+  queued: 'na fila, começa quando um download terminar', paused: 'pausado', error: j.err || 'parou com erro', canceled: 'cancelado', done: 'concluído'
+}[j.state] || '');
+
+function renderFila() {
+  const order = { running: 0, queued: 1, paused: 2, error: 3, canceled: 4, done: 5 };
+  const list = Object.values(S.jobs).filter(j => j.state !== 'done').sort((a, b) => order[a.state] - order[b.state]);
+  const active = list.filter(j => j.state === 'running' || j.state === 'queued' || j.state === 'paused').length;
+  $('cAnd').textContent = list.length; $('cCon').textContent = S.history.length;
+  $('filaBadge').textContent = active; $('filaBadge').style.display = active ? 'flex' : 'none';
+  document.querySelectorAll('.tabs div').forEach(d => d.classList.toggle('on', d.dataset.t === S.tab));
+  $('tAnd').style.display = S.tab === 'and' ? 'flex' : 'none';
+  $('tCon').style.display = S.tab === 'con' ? 'flex' : 'none';
+  if (curPage !== 'pgFila') return;
+  const fmt = r => r.mode === 'a' ? 'Áudio ' + ['WAV', 'MP3', 'M4A', 'FLAC', 'OPUS'][r.audio || 0] : 'Vídeo MP4';
+  $('tAnd').innerHTML = list.length ? list.map(j => {
+    const r = j.req || {}, title = r.title || r.url;
+    let mid;
+    if (j.state === 'running') {
+      const pct = j.indet ? '' : Math.floor(j.pct || 0) + '%';
+      mid = '<div class="mu" style="margin:2px 0 8px">' + fmt(r) + ', ' + esc((j.stage || 'Baixando').toLowerCase()) + (j.item ? ': vídeo ' + esc(j.item) : '') + '</div><div class="r"><div class="pgb' + (j.indet ? ' ind' : '') + '"><div style="width:' + (j.indet ? 30 : (j.pct || 0)) + '%"></div></div><span class="mu" style="white-space:nowrap">' + [pct, j.speed].filter(Boolean).join(', ') + '</span></div>';
+    } else mid = '<div class="mu" style="margin-top:2px;' + (j.state === 'error' ? 'color:var(--er)' : '') + '">' + fmt(r) + ', ' + esc(stateTxt(j)) + '</div>';
+    const btn = (op, ic, t) => '<button class="ib" title="' + t + '" data-op="' + op + '" data-id="' + j.id + '">' + I(ic, 16) + '</button>';
+    let acts = '';
+    if (j.state === 'running') acts = btn('pause', 'player-pause', 'Pausar') + btn('cancel', 'x', 'Cancelar');
+    else if (j.state === 'queued') acts = btn('cancel', 'x', 'Cancelar');
+    else if (j.state === 'paused') acts = btn('resume', 'player-play', 'Continuar') + btn('remove', 'x', 'Remover da lista');
+    else acts = btn('resume', 'refresh', 'Tentar de novo') + btn('remove', 'x', 'Remover da lista');
+    return '<div class="item">' + thumbHtml(r.thumb, r.mode === 'a' ? 'audio' : 'video') + '<div style="flex:1;min-width:0"><div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(title) + '</div>' + mid + '</div>' + acts + '</div>';
+  }).join('') : '<div class="empty">' + I('cloud-download', 34) + '<div>Nada baixando agora.</div></div>';
+  $('tCon').innerHTML = S.history.length ? '<div class="r" style="justify-content:flex-end"><a class="lk" tabindex="0" id="limpar">' + I('trash') + 'Limpar lista</a></div>' + S.history.map((h, i) =>
+    '<div class="item">' + thumbHtml(h.thumb, h.kind) + '<div style="flex:1;min-width:0"><div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(h.title) + '</div><div class="mu" style="margin-top:2px">' + esc(h.desc) + '</div></div><span class="mu" style="white-space:nowrap">' + when(h.when) + '</span><button class="ib" title="Abrir" data-ho="' + i + '">' + I(h.kind === 'pasta' ? 'folder-open' : 'player-play', 16) + '</button><button class="ib" title="Mostrar na pasta" data-hr="' + i + '">' + I('folder', 16) + '</button><button class="ib" title="Remover da lista" data-hx="' + i + '">' + I('x', 16) + '</button></div>').join('')
+    : '<div class="empty">' + I('checks', 34) + '<div>Nenhum download concluído ainda.</div></div>';
+  if ($('limpar')) $('limpar').onclick = () => zt_clearHistory();
+}
+$('tAnd').addEventListener('click', e => {
+  const b = e.target.closest('button[data-op]'); if (!b) return;
+  ({ pause: zt_pause, cancel: zt_cancel, resume: zt_resume, remove: zt_remove })[b.dataset.op](b.dataset.id);
+});
+$('tCon').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const h = S.history[b.dataset.ho ?? b.dataset.hr ?? b.dataset.hx]; if (!h) return;
+  if (b.dataset.ho !== undefined) openHist(h);
+  else if (b.dataset.hr !== undefined) zt_reveal(h.path);
+  else zt_removeHistory(h.id);
+});
+
+// ---------------- requisitos ----------------
+const TOOLDEF = {
+  yt: { n: 'yt-dlp', ic: 'cloud-download', d: 'Baixa os vídeos e os áudios. Inclui o Deno, que ajuda a ler as páginas do YouTube.', req: 'Obrigatório' },
+  ff: { n: 'FFmpeg', ic: 'scissors', d: 'Junta áudio e vídeo, converte os formatos e faz as fatias.', req: 'Obrigatório' },
+  wv: { n: 'WebView2', ic: 'brand-windows', d: 'Desenha a interface do ZTube.', req: 'Vem com o Windows' }
+};
+let checking = true;
+function toolLine(t) {
+  if (t.status === 'busy') return t.text || 'Instalando…';
+  if (t.err) return t.err;
+  if (t.status === 'miss') return 'Não encontrado neste computador.';
+  if (t.status === 'sys') return t.version ? 'Versão ' + t.version + ', atualizado pelo Windows.' : 'Atualizado pelo Windows.';
+  const sys = t.source === 'sistema' ? ' (instalado no sistema)' : '';
+  if (t.status === 'old') {
+    if (t.note === 'sem-deno' && (!t.latest || t.version === t.latest)) return 'Versão ' + t.version + sys + '. Falta o Deno, que vem junto.';
+    return 'Versão ' + (t.version || '?') + (t.source === 'sistema' ? ' instalada no sistema' : ' instalada') + '. Nova versão: ' + (t.latest || 'disponível') + '.';
+  }
+  return 'Versão ' + (t.version || '?') + (t.latest && t.version === t.latest ? ', a mais recente' : '') + sys + '.';
+}
+function toolPill(t) {
+  if (t.status === 'busy') return '<span class="stp old">' + I('download', 13) + 'Instalando</span>';
+  if (t.status === 'old') return '<span class="stp old">' + I('alert-circle', 13) + (t.note === 'sem-deno' && (!t.latest || t.version === t.latest) ? 'Falta o Deno' : 'Atualização disponível') + '</span>';
+  if (t.status === 'miss') return '<span class="stp miss">' + I('alert-circle', 13) + 'Não instalado</span>';
+  return '<span class="stp ok">' + I('check', 13) + 'Instalado</span>';
+}
+function toolAct(t) {
+  if (t.status === 'busy' || t.status === 'sys' || t.status === 'ok') return '';
+  const sz = t.size ? ' (' + t.size + ')' : '';
+  if (t.status === 'miss') return '<button class="pri" data-in="' + t.id + '">' + I('download', 17) + 'Instalar' + sz + '</button>';
+  return '<button data-in="' + t.id + '">' + I('refresh', 17) + (t.note === 'sem-deno' && (!t.latest || t.version === t.latest) ? 'Instalar o Deno' : 'Atualizar') + sz + '</button>';
+}
+function renderReq() {
+  const tools = S.tools.length ? S.tools : [{ id: 'yt', status: 'check' }, { id: 'ff', status: 'check' }, { id: 'wv', status: 'check' }];
+  $('reqList').innerHTML = tools.map(t => {
+    const d = TOOLDEF[t.id]; if (!d) return '';
+    const line = t.status === 'check' ? 'Verificando…' : toolLine(t);
+    return '<div class="item req"><div class="ric">' + I(d.ic, 22) + '</div><div style="flex:1;min-width:0"><div class="r" style="gap:8px"><span style="font-weight:700;font-size:14.5px">' + d.n + '</span>' + (t.status === 'check' ? '' : toolPill(t)) + '<span class="mu" style="font-size:12px">' + d.req + '</span></div><div class="mu" style="margin-top:3px' + (t.err ? ';color:var(--er)' : '') + '">' + d.d + ' ' + esc(line) + '</div>' + (t.status === 'busy' ? '<div class="pgb"><div style="width:' + (t.pct || 0) + '%"></div></div>' : '') + '</div>' + (t.status === 'check' ? '' : toolAct(t)) + '</div>';
+  }).join('');
+  const miss = S.tools.filter(t => t.status === 'miss').length, old = S.tools.filter(t => t.status === 'old').length, busy = S.tools.some(t => t.status === 'busy');
+  $('reqDot').style.display = (miss || old) ? 'block' : 'none';
+  const si = $('sumI');
+  if (checking && !S.tools.length) { si.style.cssText = 'background:var(--acs);color:var(--act)'; si.innerHTML = I('loader-2', 24); $('sumT').textContent = 'Verificando…'; $('sumS').textContent = 'Procurando as ferramentas e conferindo as versões.'; $('allBtn').style.display = 'none'; }
+  else if (busy) { si.style.cssText = 'background:var(--acs);color:var(--act)'; si.innerHTML = I('download', 24); $('sumT').textContent = 'Instalando…'; $('sumS').textContent = 'Pode continuar usando o ZTube enquanto isso.'; $('allBtn').style.display = 'none'; }
+  else if (miss || old) {
+    si.style.cssText = 'background:color-mix(in srgb,var(--wa) 20%,transparent);color:var(--wa)'; si.innerHTML = I('alert-circle', 24);
+    $('sumT').textContent = [miss ? (miss === 1 ? 'Falta 1 ferramenta' : 'Faltam ' + miss + ' ferramentas') : '', old ? (old === 1 ? '1 atualização disponível' : old + ' atualizações disponíveis') : ''].filter(Boolean).join(' e ');
+    $('sumS').textContent = miss ? 'Sem elas, o ZTube não consegue baixar.' : 'Atualizar evita erros quando o YouTube muda.';
+    $('allBtn').style.display = 'inline-flex';
+  } else {
+    si.style.cssText = 'background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)'; si.innerHTML = I('check', 24);
+    $('sumT').textContent = 'Tudo pronto para baixar'; $('sumS').textContent = 'As ferramentas estão instaladas e atualizadas.'; $('allBtn').style.display = 'none';
+  }
+}
+$('reqList').addEventListener('click', e => { const b = e.target.closest('[data-in]'); if (b) install(b.dataset.in); });
+function install(id) {
+  const t = S.tools.find(x => x.id === id); if (t) { t.status = 'busy'; t.pct = 0; t.text = 'Preparando…'; t.err = ''; }
+  renderReq(); zt_install(id);
+}
+$('allBtn').onclick = () => S.tools.filter(t => t.status === 'miss' || t.status === 'old').forEach(t => install(t.id));
+$('reCheck').onclick = () => { checking = true; S.tools = []; renderReq(); zt_checkTools(); };
+$('openTools').onclick = () => zt_openTools();
+$('footUp').onclick = () => { page('pgReq'); $('reCheck').onclick(); };
+
+// ---------------- eventos vindos do motor ----------------
+window.ztEvent = (name, d) => {
+  switch (name) {
+    case 'probe':
+      if (d.token !== S.token) return;
+      S.probing = false;
+      if (d.err) S.probeErr = d.err === 'tools' ? 'Instale as ferramentas em Requisitos para ler o link.' : d.err;
+      else { S.info = d; S.kind = d.kind; }
+      renderLink(); break;
+    case 'pinned':
+      if (d.token !== S.token) return;
+      S.pinBusy = false; S.pinSegs = d.segs || []; S.segSrc = '';
+      renderFat(); renderGo(); break;
+    case 'job':
+      S.jobs[d.id] = d;
+      if (d.id === S.curJob) { S.curSnap = d; renderDl(); } else renderGo();
+      renderFila(); break;
+    case 'jobs':
+      S.jobs = {}; d.forEach(j => S.jobs[j.id] = j); renderFila(); renderGo(); break;
+    case 'history':
+      S.history = d || []; renderRec(); renderFila(); break;
+    case 'tools':
+      checking = false;
+      S.tools = d;
+      S.hasYt = d.some(t => t.id === 'yt' && t.status !== 'miss' && !(t.status === 'busy' && !t.version));
+      S.hasFF = d.some(t => t.id === 'ff' && t.status !== 'miss' && !(t.status === 'busy' && !t.version));
+      renderReq(); renderGo();
+      if (!S.hasYt || !S.hasFF) { if (!S.firstReq) { S.firstReq = true; page('pgReq'); } }
+      break;
+    case 'toolProgress': {
+      const t = S.tools.find(x => x.id === d.id);
+      if (t) Object.assign(t, { status: 'busy', pct: d.pct, text: d.text, err: '' });
+      renderReq(); break;
+    }
+    case 'toolError': {
+      toast(d.err);
+      setTimeout(() => { const t = S.tools.find(x => x.id === d.id); if (t) t.err = d.err; renderReq(); }, 50);
+      break;
+    }
+    case 'toast': toast(d); break;
+  }
+};
+
+// ---------------- início ----------------
+async function boot() {
+  if (!window.zt_ready) { setTimeout(boot, 50); return; }
+  const r = await zt_ready();
+  S.settings = Object.assign(S.settings, r.settings || {});
+  if (S.settings.tema === 'light' || S.settings.tema === 'dark') html.dataset.theme = S.settings.tema;
+  syncTema();
+  $('pasta').value = S.settings.pasta || '';
+  $('ver').textContent = 'ZTube ' + r.version;
+  S.history = r.history || [];
+  (r.jobs || []).forEach(j => S.jobs[j.id] = j);
+  S.hasYt = r.hasYt; S.hasFF = r.hasFF;
+  fillQ(); renderLink(); renderDl(); renderRec(); renderFila(); renderReq();
+  if (!S.hasYt || !S.hasFF) { S.firstReq = true; page('pgReq'); }
+  $('url').focus();
+}
+boot();
+
+</script>
+</body>
+</html>
